@@ -1,7 +1,6 @@
 package dev.kdriver.nextjs
 
 import dev.kaccelero.serializers.Serialization
-import dev.kdriver.cdp.domain.page
 import dev.kdriver.core.tab.ReadyState
 import dev.kdriver.core.tab.Tab
 import dev.kdriver.core.tab.evaluate
@@ -15,35 +14,12 @@ import kotlinx.serialization.json.*
 class DefaultCapturedPushes(private val tab: Tab) : CapturedPushes {
 
     override suspend fun <R> capture(block: suspend CapturedPushes.() -> R): R {
-        val injection = """
-            window.__capturedNextF = window.__capturedNextF || [];
-            (function(){
-              function wrapArray(arr){
-                if (!arr || arr.__wrapped) return;
-                const origPush = arr.push.bind(arr);
-                arr.push = function(...args){
-                  window.__capturedNextF.push(args);
-                  return origPush(...args);
-                };
-                arr.__wrapped = true;
-              }
-              Object.defineProperty(window, '__next_f', {
-                configurable: true,
-                enumerable: true,
-                get() { return this.___real_next_f; },
-                set(v) { this.___real_next_f = v; wrapArray(v); }
-              });
-              if (Array.isArray(window.__next_f)) wrapArray(window.__next_f);
-            })();
-        """.trimIndent()
-        tab.page.enable()
-        tab.page.addScriptToEvaluateOnNewDocument(injection)
         return block()
     }
 
     override suspend fun fetchAll(): List<JsonElement> {
         runCatching { tab.waitForReadyState(ReadyState.COMPLETE) }
-        val raw = tab.evaluate<String>("JSON.stringify(window.__capturedNextF)") ?: "[]"
+        val raw = tab.evaluate<String>("JSON.stringify(self.__next_f)") ?: "[]"
         val jsonArray = Serialization.json.parseToJsonElement(raw).jsonArray
         val results = mutableListOf<JsonElement>()
         for (push in jsonArray) {

@@ -27,7 +27,7 @@ class DefaultCapturedPushesTest {
         """.trimIndent()
 
         coEvery { tab.waitForReadyState(ReadyState.COMPLETE) } returns true
-        coEvery { tab.rawEvaluate("JSON.stringify(window.__capturedNextF)") } returns JsonPrimitive(capturedNextFJson)
+        coEvery { tab.rawEvaluate("JSON.stringify(self.__next_f)") } returns JsonPrimitive(capturedNextFJson)
         val sut = DefaultCapturedPushes(tab)
 
         val results = sut.fetchAll()
