@@ -1,5 +1,6 @@
 package dev.kdriver.nextjs
 
+import dev.kaccelero.serializers.Serialization
 import dev.kdriver.cdp.domain.page
 import dev.kdriver.core.tab.ReadyState
 import dev.kdriver.core.tab.Tab
@@ -43,7 +44,7 @@ class DefaultCapturedPushes(private val tab: Tab) : CapturedPushes {
     override suspend fun fetchAll(): List<JsonElement> {
         runCatching { tab.waitForReadyState(ReadyState.COMPLETE) }
         val raw = tab.evaluate<String>("JSON.stringify(window.__capturedNextF)") ?: "[]"
-        val jsonArray = Json.parseToJsonElement(raw).jsonArray
+        val jsonArray = Serialization.json.parseToJsonElement(raw).jsonArray
         val results = mutableListOf<JsonElement>()
         for (push in jsonArray) {
             var args = push.jsonArray
@@ -54,7 +55,7 @@ class DefaultCapturedPushes(private val tab: Tab) : CapturedPushes {
                     val objects = extractJsonObjects(payload)
                     for (obj in objects) {
                         try {
-                            results += Json.parseToJsonElement(obj)
+                            results += Serialization.json.parseToJsonElement(obj)
                         } catch (_: Exception) {
                         }
                     }
