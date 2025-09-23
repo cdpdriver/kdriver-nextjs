@@ -22,6 +22,10 @@ dependencyResolutionManagement {
             plugin("ksp", "com.google.devtools.ksp").version("2.1.21-2.0.2")
             plugin("maven", "com.vanniktech.maven.publish").version("0.30.0")
 
+            // Kaccelero
+            version("kaccelero", "0.6.6")
+            library("kaccelero-core", "dev.kaccelero", "core").versionRef("kaccelero")
+
             // kdriver
             version("kdriver", "0.2.12")
             library("kdriver-core", "dev.kdriver", "core").versionRef("kdriver")
@@ -36,3 +40,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "kdriver-nextjs"
 include(":nextjs")
+include(":nextjs-engine")

@@ -16,7 +16,7 @@ Add the dependency to your `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("dev.kdriver:nextjs:0.1.1")
+    implementation("dev.kdriver:nextjs:0.1.2")
 }
 ```
 
@@ -26,7 +26,7 @@ dependencies {
 fun main() = runBlocking {
     val browser = createBrowser(this)
     val tab = browser.get("about:blank")
-    val allObjects = tab.capturePushes {
+    val allObjects = tab.capturePushesFromJs { // Or `capturePushesFromHtml`
         tab.get(url)
         fetchAll()
     }

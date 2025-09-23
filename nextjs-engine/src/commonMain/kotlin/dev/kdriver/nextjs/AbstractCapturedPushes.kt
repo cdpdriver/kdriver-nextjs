@@ -1,26 +1,22 @@
 package dev.kdriver.nextjs
 
 import dev.kaccelero.serializers.Serialization
-import dev.kdriver.core.tab.ReadyState
-import dev.kdriver.core.tab.Tab
-import dev.kdriver.core.tab.evaluate
 import kotlinx.serialization.json.*
 
 /**
- * Default implementation of the [CapturedPushes] interface for capturing and fetching push events from a Next.js application.
- *
- * @param tab The [Tab] instance representing the browser tab to interact with.
+ * Abstract implementation of [CapturedPushes] that provides common functionality for capturing and fetching push events.
  */
-class DefaultCapturedPushes(private val tab: Tab) : CapturedPushes {
+abstract class AbstractCapturedPushes : CapturedPushes {
 
-    override suspend fun <R> capture(block: suspend CapturedPushes.() -> R): R {
-        return block()
-    }
+    /**
+     * Provides the next set of push events as a [JsonArray].
+     *
+     * @return A [JsonArray] containing the next push events.
+     */
+    abstract suspend fun provideNextF(): JsonArray
 
     override suspend fun fetchAll(): List<JsonElement> {
-        runCatching { tab.waitForReadyState(ReadyState.COMPLETE) }
-        val raw = tab.evaluate<String>("JSON.stringify(self.__next_f)") ?: "[]"
-        val jsonArray = Serialization.json.parseToJsonElement(raw).jsonArray
+        val jsonArray = provideNextF()
         val results = mutableListOf<JsonElement>()
         for (push in jsonArray) {
             var args = push.jsonArray

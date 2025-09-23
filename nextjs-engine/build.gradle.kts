@@ -12,7 +12,7 @@ mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
     pom {
-        name.set("nextjs")
+        name.set("nextjs-engine")
         description.set("nextjs extensions for kdriver.")
         url.set(project.ext.get("url")?.toString())
         licenses {
@@ -62,8 +62,7 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                api(project(":nextjs-engine"))
-                api(libs.kdriver.core)
+                api(libs.kaccelero.core)
             }
         }
         val jvmTest by getting {
