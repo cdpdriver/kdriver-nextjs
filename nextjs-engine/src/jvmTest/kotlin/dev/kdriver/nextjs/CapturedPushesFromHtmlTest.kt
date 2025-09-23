@@ -24,6 +24,7 @@ class CapturedPushesFromHtmlTest {
                 <script>
                   self.__next_f.push(["other","prefix {\"beta\":2} middle [{\"gamma\":3}] suffix"]);
                   self.__next_f.push([["wrapped","{\"delta\":4}"]]);
+                  self.__next_f.push([["with-parentheses","{\"title\":\"hello (world)\"}"]]);
                 </script>
               </body>
             </html>
@@ -38,7 +39,8 @@ class CapturedPushesFromHtmlTest {
         // 2) {"beta":2}
         // 3) [{"gamma":3}]
         // 4) {"delta":4}
-        assertEquals(4, results.size)
+        // 5) {"title":"hello (world)"}
+        assertEquals(5, results.size)
 
         assertIs<JsonObject>(results[0])
         assertEquals(JsonPrimitive(1), (results[0] as JsonObject)["alpha"])
@@ -52,5 +54,9 @@ class CapturedPushesFromHtmlTest {
 
         assertIs<JsonObject>(results[3])
         assertEquals(JsonPrimitive(4), (results[3] as JsonObject)["delta"])
+
+        // Ensure the regex works with parentheses in strings
+        assertIs<JsonObject>(results[4])
+        assertEquals(JsonPrimitive("hello (world)"), (results[4] as JsonObject)["title"])
     }
 }

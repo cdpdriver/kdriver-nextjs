@@ -22,7 +22,7 @@ abstract class AbstractCapturedPushesFromHtml : AbstractCapturedPushes() {
         val results = mutableListOf<JsonElement>()
 
         val scriptRegex = Regex("<script[^>]*>([\\s\\S]*?)</script>", RegexOption.IGNORE_CASE)
-        val pushRegex = Regex("self\\.__next_f\\.push\\(\\s*(\\[[^)]*])\\s*\\)")
+        val pushRegex = Regex("self\\.__next_f\\.push\\(\\s*(\\[.*])\\s*\\)")
 
         for (match in scriptRegex.findAll(html)) {
             val scriptContent = match.groupValues[1]
