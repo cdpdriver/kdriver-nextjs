@@ -52,6 +52,12 @@ class FlightPayloadResolver(
     private val rows = mutableMapOf<String, RowValue>()
 
     /**
+     * Pending text row ID waiting for data in next push.
+     * Set when we encounter a text tag with length encoding but no data.
+     */
+    private var pendingTextRowId: String? = null
+
+    /**
      * Parse all __next_f pushes and build the row map.
      *
      * Expected format:
@@ -60,6 +66,14 @@ class FlightPayloadResolver(
      *   [1, "0:\"$L1\"\n"],
      *   [1, "1:I[\"path\",[]]\n"],
      *   [1, "2:[\"$\",\"div\",null,{}]\n"]
+     * ]
+     * ```
+     *
+     * Special case for multi-push text:
+     * ```json
+     * [
+     *   [1, "d1:T7db,\n"],    // Text tag with no data after comma
+     *   [1, "Actual text..."]  // Next push contains the text
      * ]
      * ```
      *
@@ -86,11 +100,25 @@ class FlightPayloadResolver(
      * @param payload The payload string with newline-separated rows
      */
     private fun parsePayload(payload: String) {
+        // Check if we have a pending text row from previous push
+        if (pendingTextRowId != null) {
+            // This payload is the text content for the pending row
+            rows[pendingTextRowId!!] = RowValue.Text(payload)
+            pendingTextRowId = null
+            return
+        }
+
         val parsedRows = RowParser.parseRows(payload)
 
         for (row in parsedRows) {
             val rowValue = parseRowValue(row)
             rows[row.id] = rowValue
+
+            // Check if this is a text row waiting for data in next push
+            if (rowValue is RowValue.Text && rowValue.value.isEmpty() && row.tag == 'T') {
+                // Text tag with no data - expect data in next push
+                pendingTextRowId = row.id
+            }
         }
     }
 
@@ -219,5 +247,6 @@ class FlightPayloadResolver(
      */
     fun clear() {
         rows.clear()
+        pendingTextRowId = null
     }
 }
