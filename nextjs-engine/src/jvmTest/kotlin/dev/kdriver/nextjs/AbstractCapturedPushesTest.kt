@@ -1,7 +1,6 @@
 package dev.kdriver.nextjs
 
-import dev.kaccelero.serializers.Serialization
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -13,7 +12,7 @@ import kotlin.test.assertIs
 class AbstractCapturedPushesTest {
 
     @Test
-    fun testFetchAll_parsesMultipleJsonElementsFromPayloads() = runBlocking {
+    fun testFetchAll_parsesMultipleJsonElementsFromPayloads() = runTest {
         val sut = object : AbstractCapturedPushes() {
             override suspend fun provideNextF(): JsonArray {
                 return Serialization.json.parseToJsonElement(

@@ -62,13 +62,14 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                api(libs.kaccelero.core)
+                api(libs.kotlinx.serialization.json)
             }
         }
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(libs.tests.mockk)
+                implementation(libs.tests.coroutines)
             }
         }
     }

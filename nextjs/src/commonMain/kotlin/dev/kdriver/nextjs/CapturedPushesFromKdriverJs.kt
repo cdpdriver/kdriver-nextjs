@@ -1,6 +1,5 @@
 package dev.kdriver.nextjs
 
-import dev.kaccelero.serializers.Serialization
 import dev.kdriver.core.tab.ReadyState
 import dev.kdriver.core.tab.Tab
 import dev.kdriver.core.tab.evaluate

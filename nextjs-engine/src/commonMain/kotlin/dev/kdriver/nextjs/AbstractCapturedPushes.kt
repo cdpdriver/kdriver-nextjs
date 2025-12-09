@@ -1,6 +1,5 @@
 package dev.kdriver.nextjs
 
-import dev.kaccelero.serializers.Serialization
 import kotlinx.serialization.json.*
 
 /**

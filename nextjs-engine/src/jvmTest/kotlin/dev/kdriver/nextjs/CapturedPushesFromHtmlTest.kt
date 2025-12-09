@@ -1,6 +1,6 @@
 package dev.kdriver.nextjs
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -11,7 +11,7 @@ import kotlin.test.assertIs
 class CapturedPushesFromHtmlTest {
 
     @Test
-    fun testFetchAll_parsesMultipleJsonElementsFromPayloads() = runBlocking {
+    fun testFetchAll_parsesMultipleJsonElementsFromPayloads() = runTest {
         val html = """
             <html>
               <head>
