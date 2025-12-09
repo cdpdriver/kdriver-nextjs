@@ -12,7 +12,7 @@ import kotlin.test.assertIs
 class AbstractCapturedPushesTest {
 
     @Test
-    fun testFetchAll_parsesMultipleJsonElementsFromPayloads() = runTest {
+    fun testDeprecatedFetchAll_parsesMultipleJsonElementsFromPayloads() = runTest {
         val sut = object : AbstractCapturedPushes() {
             override suspend fun provideNextF(): JsonArray {
                 return Serialization.json.parseToJsonElement(

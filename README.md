@@ -16,7 +16,7 @@ Add the dependency to your `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("dev.kdriver:nextjs:0.1.5")
+    implementation("dev.kdriver:nextjs:0.2.0")
 }
 ```
 
@@ -26,10 +26,10 @@ dependencies {
 fun main() = runBlocking {
     val browser = createBrowser(this)
     val tab = browser.get("about:blank")
-    val allObjects = tab.capturePushesFromJs { // Or `capturePushesFromHtml`
+    val resolvedObject = tab.capturePushesFromJs { // Or `capturePushesFromHtml`
         tab.get(url)
-        fetchAll()
+        resolvedNextF() // Resolves Next.js specific data using RSC resolver
     }
-    println("Raw captured objects: ${allObjects.size}")
+    println(resolvedObject)
 }
 ```
