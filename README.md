@@ -26,10 +26,10 @@ dependencies {
 fun main() = runBlocking {
     val browser = createBrowser(this)
     val tab = browser.get("about:blank")
-    val allObjects = tab.capturePushesFromJs { // Or `capturePushesFromHtml`
+    val resolvedObject = tab.capturePushesFromJs { // Or `capturePushesFromHtml`
         tab.get(url)
-        fetchAll()
+        resolvedNextF() // Resolves Next.js specific data using RSC resolver
     }
-    println("Raw captured objects: ${allObjects.size}")
+    println(resolvedObject)
 }
 ```
