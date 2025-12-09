@@ -7,13 +7,13 @@ import kotlinx.serialization.json.*
  */
 abstract class AbstractCapturedPushes : CapturedPushes {
 
-    /**
-     * Provides the next set of push events as a [JsonArray].
-     *
-     * @return A [JsonArray] containing the next push events.
-     */
-    abstract suspend fun provideNextF(): JsonArray
+    override suspend fun resolvedNextF(): JsonElement {
+        val resolver = FlightPayloadResolver()
+        resolver.parsePayloads(provideNextF())
+        return resolver.getResolvedRoot() ?: error("No resolved root found")
+    }
 
+    @Deprecated("Use resolvedNextF() for single resolved element.")
     override suspend fun fetchAll(): List<JsonElement> {
         val jsonArray = provideNextF()
         val results = mutableListOf<JsonElement>()

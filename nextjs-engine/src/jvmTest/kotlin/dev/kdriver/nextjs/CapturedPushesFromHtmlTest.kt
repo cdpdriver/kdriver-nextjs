@@ -9,9 +9,35 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
 class CapturedPushesFromHtmlTest {
+    @Test
+    fun testResolvedFromHtml() = runTest {
+        val html = """
+            <html>
+              <head>
+                <script>
+                  self.__next_f = [];
+                  self.__next_f.push([1, "0:\"${'$'}L1\"\n"])
+                </script>
+              </head>
+              <body>
+                <script>
+                  self.__next_f.push([1, "1:I[\"(app-pages-browser)/./node_modules/next/...\",[\"....\"],\"\"]\n"])
+                  self.__next_f.push([1, "2:[\"$\",\"div\",null,{\"className\":\"container\",\"children\":\"${'$'}L3\"}]\n"])
+                  self.__next_f.push([1, "3:[\"$\",\"p\",null,{\"children\":\"Hello World\"}]\n"])
+                </script>
+              </body>
+            </html>
+        """.trimIndent()
+
+        val sut = CapturedPushesFromHtml(html)
+
+        val result = sut.resolvedNextF()
+
+        println(result)
+    }
 
     @Test
-    fun testFetchAll_parsesMultipleJsonElementsFromPayloads() = runTest {
+    fun testDeprecatedFetchAll_parsesMultipleJsonElementsFromPayloads() = runTest {
         val html = """
             <html>
               <head>
