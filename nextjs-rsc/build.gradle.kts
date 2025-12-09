@@ -12,8 +12,8 @@ mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
     pom {
-        name.set("nextjs-engine")
-        description.set("nextjs extensions for kdriver.")
+        name.set("nextjs-rsc")
+        description.set("React Server Components (RSC) payload parser for kdriver.")
         url.set(project.ext.get("url")?.toString())
         licenses {
             license {
@@ -79,14 +79,12 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                optIn("dev.kdriver.cdp.InternalCdpApi")
                 optIn("kotlin.js.ExperimentalJsExport")
             }
         }
         val commonMain by getting {
             dependencies {
                 api(libs.kotlinx.serialization.json)
-                api(project(":nextjs-rsc"))
             }
         }
         val jvmTest by getting {

@@ -1,5 +1,6 @@
 package dev.kdriver.nextjs
 
+import dev.kdriver.nextjs.rsc.FlightPayloadResolver
 import kotlinx.serialization.json.*
 
 /**

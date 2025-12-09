@@ -12,3 +12,4 @@ plugins {
 
 include(":nextjs")
 include(":nextjs-engine")
+include(":nextjs-rsc")
