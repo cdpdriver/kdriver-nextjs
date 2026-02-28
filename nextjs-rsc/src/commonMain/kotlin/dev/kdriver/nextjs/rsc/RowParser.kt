@@ -73,11 +73,64 @@ object RowParser {
     /**
      * Parses multiple row lines from a payload.
      *
+     * Handles T rows with length-encoded text (format: `id:T<hexLen>,<text>`) which
+     * may contain literal newlines in their content. The hex length is used to read
+     * the exact byte count of text, skipping past any embedded newlines, rather than
+     * stopping at the first newline like a naive line-split would.
+     *
      * @param payload The complete payload string with newline-separated rows
      * @return List of successfully parsed rows
      */
     fun parseRows(payload: String): List<ParsedRow> {
-        return payload.split('\n')
-            .mapNotNull { parseRow(it) }
+        val results = mutableListOf<ParsedRow>()
+        var pos = 0
+
+        while (pos < payload.length) {
+            // Skip blank lines
+            if (payload[pos] == '\n') {
+                pos++
+                continue
+            }
+
+            val lineEnd = payload.indexOf('\n', pos)
+            val line = if (lineEnd == -1) payload.substring(pos) else payload.substring(pos, lineEnd)
+
+            if (line.isBlank()) {
+                pos = if (lineEnd == -1) payload.length else lineEnd + 1
+                continue
+            }
+
+            // Check if this is a length-encoded T row (may span multiple lines)
+            val colonIdx = line.indexOf(':')
+            if (colonIdx > 0) {
+                val rest = line.substring(colonIdx + 1)
+                if (rest.isNotEmpty() && rest[0] == 'T') {
+                    val afterT = rest.substring(1)
+                    val commaIdx = afterT.indexOf(',')
+                    if (commaIdx > 0) {
+                        val potentialLength = afterT.substring(0, commaIdx)
+                        if (potentialLength.all { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }) {
+                            val textByteLength = potentialLength.toLong(16).toInt()
+                            val textStart = pos + colonIdx + 1 + 1 + commaIdx + 1 // skip id + ':' + 'T' + hexLen + ','
+                            val remaining = payload.substring(textStart)
+                            val remainingBytes = remaining.toByteArray(Charsets.UTF_8)
+                            if (textByteLength <= remainingBytes.size) {
+                                val text = String(remainingBytes, 0, textByteLength, Charsets.UTF_8)
+                                results.add(ParsedRow(line.substring(0, colonIdx), 'T', "$potentialLength,$text"))
+                                pos = textStart + text.length
+                                if (pos < payload.length && payload[pos] == '\n') pos++
+                                continue
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Regular row — parse the current line as-is
+            parseRow(line)?.let { results.add(it) }
+            pos = if (lineEnd == -1) payload.length else lineEnd + 1
+        }
+
+        return results
     }
 }

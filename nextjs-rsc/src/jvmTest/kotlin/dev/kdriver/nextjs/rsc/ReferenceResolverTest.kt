@@ -1,11 +1,6 @@
 package dev.kdriver.nextjs.rsc
 
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.*
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -20,7 +15,7 @@ class ReferenceResolverTest {
         )
 
         val resolver = ReferenceResolver(rows)
-        val result = resolver.resolve(rows["0"]!!.let { (it as RowValue.Model).json })
+        val result = resolver.resolve(rows["0"]!!.json)
 
         assertIs<JsonArray>(result)
         assertEquals("Hello", result[0].jsonPrimitive.content)
@@ -35,7 +30,7 @@ class ReferenceResolverTest {
         )
 
         val resolver = ReferenceResolver(rows)
-        val result = resolver.resolve(rows["0"]!!.let { (it as RowValue.Model).json })
+        val result = resolver.resolve(rows["0"]!!.json)
 
         assertIs<JsonPrimitive>(result)
         assertEquals("Final value", result.content)
@@ -49,7 +44,7 @@ class ReferenceResolverTest {
         )
 
         val resolver = ReferenceResolver(rows)
-        val result = resolver.resolve(rows["0"]!!.let { (it as RowValue.Model).json })
+        val result = resolver.resolve(rows["0"]!!.json)
 
         assertIs<JsonPrimitive>(result)
         assertEquals("Async result", result.content)
@@ -63,7 +58,7 @@ class ReferenceResolverTest {
         )
 
         val resolver = ReferenceResolver(rows)
-        val result = resolver.resolve(rows["0"]!!.let { (it as RowValue.Model).json })
+        val result = resolver.resolve(rows["0"]!!.json)
 
         assertIs<JsonPrimitive>(result)
         assertEquals("Hex ref value", result.content)
@@ -91,7 +86,7 @@ class ReferenceResolverTest {
         )
 
         val resolver = ReferenceResolver(rows)
-        val result = resolver.resolve(rows["0"]!!.let { (it as RowValue.Model).json })
+        val result = resolver.resolve(rows["0"]!!.json)
 
         assertIs<JsonArray>(result)
         // First element should be null (undefined)
@@ -108,7 +103,7 @@ class ReferenceResolverTest {
         )
 
         val resolver = ReferenceResolver(rows)
-        val result = resolver.resolve(rows["0"]!!.let { (it as RowValue.Model).json })
+        val result = resolver.resolve(rows["0"]!!.json)
 
         // Should resolve the nested reference
         assertIs<kotlinx.serialization.json.JsonObject>(result)
@@ -125,7 +120,7 @@ class ReferenceResolverTest {
         )
 
         val resolver = ReferenceResolver(rows)
-        val result = resolver.resolve(rows["0"]!!.let { (it as RowValue.Model).json })
+        val result = resolver.resolve(rows["0"]!!.json)
 
         assertIs<JsonArray>(result)
         assertEquals(2, result.size)
@@ -140,7 +135,7 @@ class ReferenceResolverTest {
         )
 
         val resolver = ReferenceResolver(rows)
-        val result = resolver.resolve(rows["0"]!!.let { (it as RowValue.Model).json })
+        val result = resolver.resolve(rows["0"]!!.json)
 
         assertIs<JsonPrimitive>(result)
         assert(result.content.contains("not found"))
@@ -197,7 +192,7 @@ class ReferenceResolverTest {
         )
 
         val resolver = ReferenceResolver(rows, maxDepth = 10)
-        val result = resolver.resolve(rows["0"]!!.let { (it as RowValue.Model).json })
+        val result = resolver.resolve(rows["0"]!!.json)
 
         // Should not crash, should return something
         assertIs<JsonPrimitive>(result)
