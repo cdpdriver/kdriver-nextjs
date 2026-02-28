@@ -386,6 +386,56 @@ class FlightPayloadResolverTest {
     }
 
     /**
+     * Working case: T row with single-line text referenced via direct hex ref ($fe).
+     * Mirrors Vinted's RSC structure where description is in a T row.
+     */
+    @Test
+    fun `test direct hex reference to T row with single-line text`() {
+        val text = "Simple description without newlines"
+        val hexLen = text.toByteArray().size.toString(16)
+        val payload = "0:{\"description\":\"\$fe\"}\nfe:T$hexLen,$text"
+
+        val resolver = FlightPayloadResolver()
+        resolver.parsePayloads(createPushesArray(payload))
+
+        val rows = resolver.getAllRows()
+        val textRow = rows["fe"]
+        assertNotNull(textRow)
+        assertIs<RowValue.Text>(textRow)
+        assertEquals(text, textRow.value)
+
+        val result = resolver.getResolvedRoot()
+        assertNotNull(result)
+        assertEquals(text, result.jsonObject["description"]?.jsonPrimitive?.content)
+    }
+
+    /**
+     * Failing case: T row with multiline text referenced via direct hex ref ($fe).
+     * Reproduces the Vinted bug where only the first line of the description is returned.
+     * After the fix, the full multiline description should be resolved correctly.
+     */
+    @Test
+    fun `test direct hex reference to T row with multiline text`() {
+        val text = "First line\nSecond line\nThird line"
+        val hexLen = text.toByteArray().size.toString(16) // = "21"
+        val payload = "0:{\"description\":\"\$fe\"}\nfe:T$hexLen,$text"
+
+        val resolver = FlightPayloadResolver()
+        resolver.parsePayloads(createPushesArray(payload))
+
+        val rows = resolver.getAllRows()
+        val textRow = rows["fe"]
+        assertNotNull(textRow)
+        assertIs<RowValue.Text>(textRow)
+        // Should contain the full multiline text, not just "First line"
+        assertEquals(text, textRow.value)
+
+        val result = resolver.getResolvedRoot()
+        assertNotNull(result)
+        assertEquals(text, result.jsonObject["description"]?.jsonPrimitive?.content)
+    }
+
+    /**
      * Helper to create JsonArray of pushes from payload string.
      */
     private fun createPushesArray(payload: String): JsonArray {

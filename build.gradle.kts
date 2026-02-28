@@ -1,12 +1,13 @@
 plugins {
     alias(libs.plugins.multiplatform) apply false
     alias(libs.plugins.maven) apply false
+    alias(libs.plugins.kover)
     alias(libs.plugins.dokka)
 }
 
 allprojects {
     group = "dev.kdriver"
-    version = "0.2.0"
+    version = "0.2.1"
     project.ext.set("url", "https://github.com/cdpdriver/kdriver-nextjs")
     project.ext.set("license.name", "Apache 2.0")
     project.ext.set("license.url", "https://www.apache.org/licenses/LICENSE-2.0.txt")
@@ -19,4 +20,10 @@ allprojects {
     repositories {
         mavenCentral()
     }
+}
+
+dependencies {
+    kover(projects.nextjs)
+    kover(projects.nextjsEngine)
+    kover(projects.nextjsRsc)
 }
