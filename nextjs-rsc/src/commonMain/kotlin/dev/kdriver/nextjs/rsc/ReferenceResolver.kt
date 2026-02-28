@@ -1,10 +1,6 @@
 package dev.kdriver.nextjs.rsc
 
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.*
 
 /**
  * Resolves RSC references in JSON elements.
@@ -26,7 +22,7 @@ import kotlinx.serialization.json.JsonPrimitive
  */
 class ReferenceResolver(
     private val rows: Map<String, RowValue>,
-    private val maxDepth: Int = 100
+    private val maxDepth: Int = 100,
 ) {
 
     /**
@@ -46,7 +42,6 @@ class ReferenceResolver(
             is JsonPrimitive -> resolveReference(element, depth)
             is JsonArray -> JsonArray(element.map { resolve(it, depth + 1) })
             is JsonObject -> JsonObject(element.mapValues { resolve(it.value, depth + 1) })
-            else -> element
         }
     }
 

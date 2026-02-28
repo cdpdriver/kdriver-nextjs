@@ -85,6 +85,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(libs.kotlinx.serialization.json)
+                api(libs.ktor.io)
             }
         }
         val jvmTest by getting {

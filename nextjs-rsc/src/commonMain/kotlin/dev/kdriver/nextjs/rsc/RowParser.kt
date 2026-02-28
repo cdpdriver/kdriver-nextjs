@@ -1,5 +1,7 @@
 package dev.kdriver.nextjs.rsc
 
+import io.ktor.utils.io.core.*
+
 /**
  * Parses RSC row format: `id:tag:data` or `id:data` (no tag).
  *
@@ -113,9 +115,9 @@ object RowParser {
                             val textByteLength = potentialLength.toLong(16).toInt()
                             val textStart = pos + colonIdx + 1 + 1 + commaIdx + 1 // skip id + ':' + 'T' + hexLen + ','
                             val remaining = payload.substring(textStart)
-                            val remainingBytes = remaining.toByteArray(Charsets.UTF_8)
+                            val remainingBytes = remaining.toByteArray()
                             if (textByteLength <= remainingBytes.size) {
-                                val text = String(remainingBytes, 0, textByteLength, Charsets.UTF_8)
+                                val text = remainingBytes.decodeToString(0, textByteLength)
                                 results.add(ParsedRow(line.substring(0, colonIdx), 'T', "$potentialLength,$text"))
                                 pos = textStart + text.length
                                 if (pos < payload.length && payload[pos] == '\n') pos++
