@@ -1,4 +1,6 @@
 rootProject.name = "kdriver-nextjs"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
     repositories {
         mavenCentral()
