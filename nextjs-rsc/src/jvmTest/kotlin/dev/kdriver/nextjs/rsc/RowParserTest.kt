@@ -128,4 +128,34 @@ class RowParserTest {
         assertNull(row.tag)
         assertEquals("Testing data", row.data)
     }
+
+    @Test
+    fun `parseRows handles length-encoded T row with single-line text`() {
+        val text = "Simple description without newlines"
+        val hexLen = text.toByteArray().size.toString(16) // = "23"
+        val payload = "0:{\"ref\":\"\$fe\"}\nfe:T$hexLen,$text"
+
+        val rows = RowParser.parseRows(payload)
+
+        val feRow = rows.find { it.id == "fe" }
+        assertNotNull(feRow)
+        assertEquals('T', feRow.tag)
+        assertEquals("$hexLen,$text", feRow.data)
+    }
+
+    @Test
+    fun `parseRows handles length-encoded T row with multiline text`() {
+        // This is the failing case: multiline T row in same payload
+        val text = "First line\nSecond line\nThird line"
+        val hexLen = text.toByteArray().size.toString(16) // = "21"
+        val payload = "0:{\"ref\":\"\$fe\"}\nfe:T$hexLen,$text"
+
+        val rows = RowParser.parseRows(payload)
+
+        val feRow = rows.find { it.id == "fe" }
+        assertNotNull(feRow)
+        assertEquals('T', feRow.tag)
+        // The data should contain the full multiline text, not just the first line
+        assertEquals("$hexLen,$text", feRow.data)
+    }
 }
